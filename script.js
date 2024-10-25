@@ -36,8 +36,8 @@ function drawBackground() {
 }
 
 function drawFireball(x, y) {
-    // Create radial gradient to simulate a fireball
-    const gradient = ctx.createRadialGradient(x + unit / 2, y + unit / 2, unit / 8, x + unit / 2, y + unit / 2, unit / 2);
+    // Draw a fire-like shape with gradient colors to simulate real flames
+    const gradient = ctx.createRadialGradient(x + unit / 2, y + unit / 2, unit / 8, x + unit / 2, y + unit / 2, unit / 1.5);
     gradient.addColorStop(0, 'orange');
     gradient.addColorStop(0.5, 'red');
     gradient.addColorStop(1, 'darkred');
@@ -47,10 +47,13 @@ function drawFireball(x, y) {
     ctx.arc(x + unit / 2, y + unit / 2, unit / 2, 0, Math.PI * 2);
     ctx.fill();
 
-    // Draw a flicker effect
+    // Create a flame-like flicker effect
     ctx.fillStyle = 'yellow';
     ctx.beginPath();
-    ctx.arc(x + unit / 2, y + unit / 2, unit / 6, 0, Math.PI * 2);
+    ctx.arc(x + unit / 2, y + unit / 2 - 5, unit / 6, 0, Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + unit / 2 + 5, y + unit / 2, unit / 6, 0, Math.PI);
     ctx.fill();
 }
 
@@ -87,7 +90,7 @@ function drawGame() {
     if (direction === 'RIGHT') head.x += unit;
 
     // Check for collision with wall or self
-    if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.some(s => s.x === head.x && s.y === head.y)) {
+    if (isCollision(head)) {
         alert(`Game Over! Score: ${score}`);
         document.location.reload();
     }
@@ -109,6 +112,22 @@ function drawGame() {
     }
 
     snake.unshift(head);
+}
+
+function isCollision(head) {
+    // Check wall collision (only stop if the snake head actually touches the wall)
+    if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) {
+        console.log("Collision with wall");
+        return true;
+    }
+    
+    // Check self-collision
+    if (snake.some((s, index) => index !== 0 && s.x === head.x && s.y === head.y)) {
+        console.log("Collision with self");
+        return true;
+    }
+    
+    return false;
 }
 
 function adjustSpeed() {
