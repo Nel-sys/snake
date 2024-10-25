@@ -7,6 +7,7 @@ let ball = spawnRandomPosition();
 let fireballs = [spawnRandomPosition(), spawnRandomPosition()];
 let direction = 'RIGHT';
 let score = 0;
+let speed = 200; // Base speed, 200ms
 
 document.addEventListener('keydown', changeDirection);
 
@@ -61,6 +62,7 @@ function drawGame() {
         score++;
         ball = spawnRandomPosition();
         fireballs.push(spawnRandomPosition()); // Add new fireball as difficulty increases
+        adjustSpeed(); // Speed up the game
     } else {
         snake.pop();
     }
@@ -74,5 +76,10 @@ function drawGame() {
     snake.unshift(head);
 }
 
-// Run the game loop
-setInterval(drawGame, 100);
+function adjustSpeed() {
+    clearInterval(gameInterval);
+    speed = Math.max(50, speed - 10); // Decrease interval time to make the game faster
+    gameInterval = setInterval(drawGame, speed);
+}
+
+let gameInterval = setInterval(drawGame, speed);
