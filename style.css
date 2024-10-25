@@ -2,18 +2,25 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #000;
-    color: #fff;
+    background-color: #f2e6e6; /* Deep navy blue to complement the game background */
+    color: #ffffff;
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
+    height: 100vh;
+    justify-content: center; /* Center content vertically */
 }
 
 h1 {
     margin: 20px;
+    font-size: 2em;
+    color: #fdbb2d; /* Yellow-orange to match the gradient */
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7); /* Slight shadow for better readability */
 }
 
 canvas {
-    border: 2px solid #fff;
-    background-color: #111;
+    border: 3px solid #ffffff; /* White border for contrast */
+    background-color: #111; /* Slightly dark canvas background for game elements */
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5); /* Add some shadow for a lifted effect */
+    border-radius: 10px; /* Rounded corners for modern look */
 }
