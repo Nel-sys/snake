@@ -2,7 +2,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #f2e6e6; /* Deep navy blue to complement the game background */
+    background-color: #1a1a2e; /* Deep navy blue to complement the game background */
     color: #ffffff;
     font-family: Arial, sans-serif;
     margin: 0;
