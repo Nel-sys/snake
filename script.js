@@ -1,5 +1,9 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const startButton = document.getElementById('startButton');
+const gameOverModal = document.getElementById('gameOverModal');
+const gameOverMessage = document.getElementById('gameOverMessage');
+const closeModalButton = document.getElementById('closeModalButton');
 
 const unit = 20; // size of one block
 let snake = [{ x: 5 * unit, y: 5 * unit }];
@@ -8,6 +12,17 @@ let fireballs = [spawnRandomPosition(), spawnRandomPosition()];
 let direction = 'RIGHT';
 let score = 0;
 let speed = 200; // Base speed, 200ms
+let gameInterval;
+
+// Initialize game state
+function resetGame() {
+    snake = [{ x: 5 * unit, y: 5 * unit }];
+    ball = spawnRandomPosition();
+    fireballs = [spawnRandomPosition(), spawnRandomPosition()];
+    direction = 'RIGHT';
+    score = 0;
+    speed = 200;
+}
 
 document.addEventListener('keydown', changeDirection);
 
@@ -18,6 +33,20 @@ function changeDirection(event) {
     if (event.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
 }
 
+startButton.addEventListener('click', () => {
+    startButton.style.display = 'none';
+    canvas.style.display = 'block';
+    resetGame();
+    gameInterval = setInterval(drawGame, speed);
+});
+
+closeModalButton.addEventListener('click', () => {
+    gameOverModal.style.display = 'none';
+    startButton.style.display = 'block';
+    canvas.style.display = 'none';
+    clearInterval(gameInterval);
+});
+
 function spawnRandomPosition() {
     return {
         x: Math.floor(Math.random() * (canvas.width / unit)) * unit,
@@ -25,48 +54,13 @@ function spawnRandomPosition() {
     };
 }
 
-function drawBackground() {
-    // Create a modern gradient background
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, '#1a2a6c'); // Dark blue
-    gradient.addColorStop(0.5, '#b21f1f'); // Red
-    gradient.addColorStop(1, '#fdbb2d'); // Yellow-orange
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-}
-
-function drawFireball(x, y) {
-    // Draw a fire-like shape with gradient colors to simulate real flames
-    const gradient = ctx.createRadialGradient(x + unit / 2, y + unit / 2, unit / 8, x + unit / 2, y + unit / 2, unit / 1.5);
-    gradient.addColorStop(0, 'orange');
-    gradient.addColorStop(0.5, 'red');
-    gradient.addColorStop(1, 'darkred');
-
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(x + unit / 2, y + unit / 2, unit / 2, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Create a flame-like flicker effect
-    ctx.fillStyle = 'yellow';
-    ctx.beginPath();
-    ctx.arc(x + unit / 2, y + unit / 2 - 5, unit / 6, 0, Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x + unit / 2 + 5, y + unit / 2, unit / 6, 0, Math.PI);
-    ctx.fill();
-}
-
-function drawBall(x, y) {
-    // Ensure regular balls are never red
-    ctx.fillStyle = 'cyan'; // Choose a color distinct from red
-    ctx.beginPath();
-    ctx.arc(x + unit / 2, y + unit / 2, unit / 2, 0, Math.PI * 2);
-    ctx.fill();
+function showGameOverMessage() {
+    gameOverMessage.textContent = `Game Over! Score: ${score}`;
+    gameOverModal.style.display = 'flex';
 }
 
 function drawGame() {
-    drawBackground(); // Draw the modern background
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw snake
     snake.forEach((part, index) => {
@@ -74,10 +68,13 @@ function drawGame() {
         ctx.fillRect(part.x, part.y, unit, unit);
     });
 
-    // Draw the regular ball
-    drawBall(ball.x, ball.y);
+    // Draw ball
+    ctx.fillStyle = 'cyan';
+    ctx.beginPath();
+    ctx.arc(ball.x + unit / 2, ball.y + unit / 2, unit / 2, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Draw fireballs with new design
+    // Draw fireballs
     fireballs.forEach(fireball => {
         drawFireball(fireball.x, fireball.y);
     });
@@ -90,50 +87,54 @@ function drawGame() {
     if (direction === 'RIGHT') head.x += unit;
 
     // Check for collision with wall or self
-    if (isCollision(head)) {
-        alert(`Game Over! Score: ${score}`);
-        document.location.reload();
+    if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height || snake.some(s => s.x === head.x && s.y === head.y)) {
+        clearInterval(gameInterval);
+        showGameOverMessage();
+        return;
     }
 
     // Check for collision with ball
     if (head.x === ball.x && head.y === ball.y) {
         score++;
         ball = spawnRandomPosition();
-        fireballs.push(spawnRandomPosition()); // Add new fireball as difficulty increases
-        adjustSpeed(); // Speed up the game
+        fireballs.push(spawnRandomPosition());
+        adjustSpeed();
     } else {
         snake.pop();
     }
 
     // Check for collision with fireballs
     if (fireballs.some(f => f.x === head.x && f.y === head.y)) {
-        alert(`Game Over! Score: ${score}`);
-        document.location.reload();
+        clearInterval(gameInterval);
+        showGameOverMessage();
+        return;
     }
 
     snake.unshift(head);
 }
 
-function isCollision(head) {
-    // Check wall collision (only stop if the snake head actually touches the wall)
-    if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) {
-        console.log("Collision with wall");
-        return true;
-    }
-    
-    // Check self-collision
-    if (snake.some((s, index) => index !== 0 && s.x === head.x && s.y === head.y)) {
-        console.log("Collision with self");
-        return true;
-    }
-    
-    return false;
+function drawFireball(x, y) {
+    const gradient = ctx.createRadialGradient(x + unit / 2, y + unit / 2, unit / 8, x + unit / 2, y + unit / 2, unit / 1.5);
+    gradient.addColorStop(0, 'orange');
+    gradient.addColorStop(0.5, 'red');
+    gradient.addColorStop(1, 'darkred');
+
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x + unit / 2, y + unit / 2, unit / 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(x + unit / 2, y + unit / 2 - 5, unit / 6, 0, Math.PI);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + unit / 2 + 5, y + unit / 2, unit / 6, 0, Math.PI);
+    ctx.fill();
 }
 
 function adjustSpeed() {
     clearInterval(gameInterval);
-    speed = Math.max(50, speed - 10); // Decrease interval time to make the game faster
+    speed = Math.max(50, speed - 10);
     gameInterval = setInterval(drawGame, speed);
 }
-
-let gameInterval = setInterval(drawGame, speed);
