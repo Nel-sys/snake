@@ -25,8 +25,45 @@ function spawnRandomPosition() {
     };
 }
 
+function drawBackground() {
+    // Create a modern gradient background
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#1a2a6c'); // Dark blue
+    gradient.addColorStop(0.5, '#b21f1f'); // Red
+    gradient.addColorStop(1, '#fdbb2d'); // Yellow-orange
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+}
+
+function drawFireball(x, y) {
+    // Create radial gradient to simulate a fireball
+    const gradient = ctx.createRadialGradient(x + unit / 2, y + unit / 2, unit / 8, x + unit / 2, y + unit / 2, unit / 2);
+    gradient.addColorStop(0, 'orange');
+    gradient.addColorStop(0.5, 'red');
+    gradient.addColorStop(1, 'darkred');
+
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(x + unit / 2, y + unit / 2, unit / 2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw a flicker effect
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(x + unit / 2, y + unit / 2, unit / 6, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawBall(x, y) {
+    // Ensure regular balls are never red
+    ctx.fillStyle = 'cyan'; // Choose a color distinct from red
+    ctx.beginPath();
+    ctx.arc(x + unit / 2, y + unit / 2, unit / 2, 0, Math.PI * 2);
+    ctx.fill();
+}
+
 function drawGame() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackground(); // Draw the modern background
 
     // Draw snake
     snake.forEach((part, index) => {
@@ -34,14 +71,12 @@ function drawGame() {
         ctx.fillRect(part.x, part.y, unit, unit);
     });
 
-    // Draw ball
-    ctx.fillStyle = 'yellow';
-    ctx.fillRect(ball.x, ball.y, unit, unit);
+    // Draw the regular ball
+    drawBall(ball.x, ball.y);
 
-    // Draw fireballs
+    // Draw fireballs with new design
     fireballs.forEach(fireball => {
-        ctx.fillStyle = 'red';
-        ctx.fillRect(fireball.x, fireball.y, unit, unit);
+        drawFireball(fireball.x, fireball.y);
     });
 
     // Move snake
