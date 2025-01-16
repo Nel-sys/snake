@@ -63,11 +63,26 @@ function spawnRandomPosition() {
 function showLevelCompleteMessage() {
     gameOverMessage.textContent = `Level ${level} completed! 🎉`;
     gameOverModal.style.display = 'flex';
+
+    // Change the "OK" button text to "Start Level X"
+    closeModalButton.textContent = `Start Level ${level + 1}`;
+    closeModalButton.onclick = startNextLevel;
+}
+
+function startNextLevel() {
+    level++; // Increment level
+    resetGame(); // Start the new level
+    gameOverModal.style.display = 'none'; // Hide the modal
+    canvas.style.display = 'block'; // Show the game canvas
 }
 
 function showGameOverMessage() {
     gameOverMessage.textContent = `Game Over! Score: ${score}`;
     gameOverModal.style.display = 'flex';
+
+    // Change the "OK" button text to "Start Level 1"
+    closeModalButton.textContent = "Start Level 1";
+    closeModalButton.onclick = resetGame;
 }
 
 function drawGame() {
@@ -111,12 +126,9 @@ function drawGame() {
 
         // If 5 balls are caught, move to the next level
         if (ballsCaught >= 5) {
-            level++;
-            showLevelCompleteMessage();
-            clearInterval(gameInterval);
-            setTimeout(() => {
-                resetGame();
-            }, 2000); // Wait for 2 seconds before starting the next level
+            showLevelCompleteMessage(); // Show level complete message
+            clearInterval(gameInterval); // Stop game interval
+            return;
         } else {
             ball = spawnRandomPosition();
             fireballs.push(spawnRandomPosition());
