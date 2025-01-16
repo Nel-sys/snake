@@ -3,7 +3,7 @@ const ctx = canvas.getContext('2d');
 const startButton = document.getElementById('startButton');
 const gameOverModal = document.getElementById('gameOverModal');
 const gameOverMessage = document.getElementById('gameOverMessage');
-const modalButton = document.getElementById('modalButton');
+const closeModalButton = document.getElementById('closeModalButton');
 const scoreLevelDisplay = document.getElementById('scoreLevel');
 
 const unit = 20; // size of one block
@@ -14,7 +14,7 @@ let direction = 'RIGHT';
 let score = 0;
 let level = 1;
 let ballsCaught = 0; // To track balls caught per level
-let speed = 200; // Base speed, 200ms
+let speed = 300; // Base speed, slower than the previous 200ms
 let gameInterval;
 
 // Initialize game state
@@ -25,8 +25,7 @@ function resetGame() {
     direction = 'RIGHT';
     score = 0;
     ballsCaught = 0;
-    speed = 200 - (level - 1) * 30; // Make the game faster as the level increases
-    scoreLevelDisplay.textContent = `Score: ${score} | Level: ${level}`;
+    speed = 300 - (level - 1) * 20; // Slow down the speed less aggressively
 }
 
 document.addEventListener('keydown', changeDirection);
@@ -45,16 +44,11 @@ startButton.addEventListener('click', () => {
     gameInterval = setInterval(drawGame, speed);
 });
 
-modalButton.addEventListener('click', () => {
-    // After level completion, increment level
-    level++; 
-    resetGame();
-    // Update modal button text for the next level
-    modalButton.textContent = `Start Level ${level}`;
-    // Hide modal and start the game again
+closeModalButton.addEventListener('click', () => {
     gameOverModal.style.display = 'none';
-    canvas.style.display = 'block';
-    gameInterval = setInterval(drawGame, speed); // restart the game loop
+    startButton.style.display = 'block';
+    canvas.style.display = 'none';
+    clearInterval(gameInterval);
 });
 
 function spawnRandomPosition() {
@@ -65,18 +59,13 @@ function spawnRandomPosition() {
 }
 
 function showLevelCompleteMessage() {
-    // Show the correct level in the modal
     gameOverMessage.textContent = `You've completed level ${level}! 🎉😊`;
-    modalButton.textContent = `Start Level ${level + 1}`; // Update button text to reflect next level
     gameOverModal.style.display = 'flex';
-    clearInterval(gameInterval); // stop game loop at level completion
 }
 
 function showGameOverMessage() {
     gameOverMessage.textContent = `Game Over! Score: ${score}`;
-    modalButton.textContent = `Try Again`; // Change button to "Try Again" for game over
     gameOverModal.style.display = 'flex';
-    clearInterval(gameInterval); // stop game loop at game over
 }
 
 function drawGame() {
@@ -120,8 +109,13 @@ function drawGame() {
 
         // If 5 balls are caught, move to the next level
         if (ballsCaught >= 5) {
+            level++;
             showLevelCompleteMessage();
-            return; // Exit game loop after level completion
+            clearInterval(gameInterval);
+            setTimeout(() => {
+                resetGame();
+                gameInterval = setInterval(drawGame, speed);
+            }, 2000); // Wait for 2 seconds before starting the next level
         } else {
             ball = spawnRandomPosition();
             fireballs.push(spawnRandomPosition());
@@ -166,7 +160,6 @@ function drawFireball(x, y) {
 
 function adjustSpeed() {
     clearInterval(gameInterval);
-    speed = Math.max(50, speed - 10); // Make the game faster as the score increases
+    speed = Math.max(50, speed - 10); // Make the game faster as the score increases, but not too fast
     gameInterval = setInterval(drawGame, speed);
 }
-
