@@ -19,6 +19,7 @@ let gameInterval;
 
 // Initialize game state
 function resetGame() {
+    // Start the snake in the center of the canvas
     snake = [{ x: Math.floor(canvas.width / 2 / unit) * unit, y: Math.floor(canvas.height / 2 / unit) * unit }];
     ball = spawnRandomPosition();
     fireballs = [spawnRandomPosition(), spawnRandomPosition()];
