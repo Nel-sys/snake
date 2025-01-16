@@ -7,9 +7,9 @@ const closeModalButton = document.getElementById('closeModalButton');
 const scoreLevelDisplay = document.getElementById('scoreLevel');
 
 const unit = 20; // size of one block
-let snake = [{ x: 5 * unit, y: 5 * unit }];
-let ball = spawnRandomPosition();
-let fireballs = [spawnRandomPosition(), spawnRandomPosition()];
+let snake = [];
+let ball = {};
+let fireballs = [];
 let direction = 'RIGHT';
 let score = 0;
 let level = 1;
@@ -19,7 +19,8 @@ let gameInterval;
 
 // Initialize game state
 function resetGame() {
-    snake = [{ x: 5 * unit, y: 5 * unit }];
+    // Set initial position for snake at the center of the canvas
+    snake = [{ x: Math.floor(canvas.width / 2 / unit) * unit, y: Math.floor(canvas.height / 2 / unit) * unit }];
     ball = spawnRandomPosition();
     fireballs = [spawnRandomPosition(), spawnRandomPosition()];
     direction = 'RIGHT';
@@ -45,10 +46,14 @@ startButton.addEventListener('click', () => {
 });
 
 closeModalButton.addEventListener('click', () => {
+    // When game over modal is closed, reset game to level 1
     gameOverModal.style.display = 'none';
     startButton.style.display = 'block';
     canvas.style.display = 'none';
+    level = 1;
+    resetGame();
     clearInterval(gameInterval);
+    gameInterval = setInterval(drawGame, speed);
 });
 
 function spawnRandomPosition() {
