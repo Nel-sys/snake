@@ -11,6 +11,8 @@ let ball = spawnRandomPosition();
 let fireballs = [spawnRandomPosition(), spawnRandomPosition()];
 let direction = 'RIGHT';
 let score = 0;
+let level = 1;
+let ballsCaught = 0; // Tracks how many balls the player has caught
 let speed = 200; // Base speed, 200ms
 let gameInterval;
 
@@ -21,6 +23,8 @@ function resetGame() {
     fireballs = [spawnRandomPosition(), spawnRandomPosition()];
     direction = 'RIGHT';
     score = 0;
+    ballsCaught = 0;
+    level = 1;
     speed = 200;
 }
 
@@ -55,7 +59,7 @@ function spawnRandomPosition() {
 }
 
 function showGameOverMessage() {
-    gameOverMessage.textContent = `Game Over! Score: ${score}`;
+    gameOverMessage.textContent = `Game Over! Score: ${score}, Level: ${level}`;
     gameOverModal.style.display = 'flex';
 }
 
@@ -96,9 +100,15 @@ function drawGame() {
     // Check for collision with ball
     if (head.x === ball.x && head.y === ball.y) {
         score++;
+        ballsCaught++;
         ball = spawnRandomPosition();
         fireballs.push(spawnRandomPosition());
         adjustSpeed();
+        if (ballsCaught >= 5) {
+            level++;
+            ballsCaught = 0; // Reset balls caught for the next level
+            fireballs.push(spawnRandomPosition()); // Add one more fireball for each level
+        }
     } else {
         snake.pop();
     }
