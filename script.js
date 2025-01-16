@@ -4,6 +4,7 @@ const startButton = document.getElementById('startButton');
 const gameOverModal = document.getElementById('gameOverModal');
 const gameOverMessage = document.getElementById('gameOverMessage');
 const closeModalButton = document.getElementById('closeModalButton');
+const scoreLevelDisplay = document.getElementById('scoreLevel');
 
 const unit = 20; // size of one block
 let snake = [{ x: 5 * unit, y: 5 * unit }];
@@ -12,7 +13,7 @@ let fireballs = [spawnRandomPosition(), spawnRandomPosition()];
 let direction = 'RIGHT';
 let score = 0;
 let level = 1;
-let ballsCaught = 0; // Tracks how many balls the player has caught
+let ballsCaught = 0; // To track balls caught per level
 let speed = 200; // Base speed, 200ms
 let gameInterval;
 
@@ -24,8 +25,7 @@ function resetGame() {
     direction = 'RIGHT';
     score = 0;
     ballsCaught = 0;
-    level = 1;
-    speed = 200;
+    speed = 200 - (level - 1) * 30; // Make the game faster as the level increases
 }
 
 document.addEventListener('keydown', changeDirection);
@@ -58,8 +58,13 @@ function spawnRandomPosition() {
     };
 }
 
+function showLevelCompleteMessage() {
+    gameOverMessage.textContent = `You've completed level ${level}! 🎉😊`;
+    gameOverModal.style.display = 'flex';
+}
+
 function showGameOverMessage() {
-    gameOverMessage.textContent = `Game Over! Score: ${score}, Level: ${level}`;
+    gameOverMessage.textContent = `Game Over! Score: ${score}`;
     gameOverModal.style.display = 'flex';
 }
 
@@ -101,13 +106,20 @@ function drawGame() {
     if (head.x === ball.x && head.y === ball.y) {
         score++;
         ballsCaught++;
-        ball = spawnRandomPosition();
-        fireballs.push(spawnRandomPosition());
-        adjustSpeed();
+
+        // If 5 balls are caught, move to the next level
         if (ballsCaught >= 5) {
             level++;
-            ballsCaught = 0; // Reset balls caught for the next level
-            fireballs.push(spawnRandomPosition()); // Add one more fireball for each level
+            showLevelCompleteMessage();
+            clearInterval(gameInterval);
+            setTimeout(() => {
+                resetGame();
+                gameInterval = setInterval(drawGame, speed);
+            }, 2000); // Wait for 2 seconds before starting the next level
+        } else {
+            ball = spawnRandomPosition();
+            fireballs.push(spawnRandomPosition());
+            adjustSpeed();
         }
     } else {
         snake.pop();
@@ -121,6 +133,9 @@ function drawGame() {
     }
 
     snake.unshift(head);
+
+    // Update score and level display
+    scoreLevelDisplay.textContent = `Score: ${score} | Level: ${level}`;
 }
 
 function drawFireball(x, y) {
@@ -145,6 +160,6 @@ function drawFireball(x, y) {
 
 function adjustSpeed() {
     clearInterval(gameInterval);
-    speed = Math.max(50, speed - 10);
+    speed = Math.max(50, speed - 10); // Make the game faster as the score increases
     gameInterval = setInterval(drawGame, speed);
 }
