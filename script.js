@@ -28,29 +28,25 @@ function resetGame() {
     level = 1;
     speed = 200; // Base speed, 200ms
     scoreLevelDisplay.textContent = `Score: ${score} | Level: ${level}`;
-    gameInterval = setInterval(drawGame, speed);
 }
 
-document.addEventListener('keydown', changeDirection);
-
-function changeDirection(event) {
-    if (event.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
-    if (event.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
-    if (event.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
-    if (event.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
-}
-
+// Game start logic
 startButton.addEventListener('click', () => {
     startButton.style.display = 'none';
     canvas.style.display = 'block';
     resetGame();
+    gameInterval = setInterval(drawGame, speed);
 });
 
+// Start next level after level completion
 closeModalButton.addEventListener('click', () => {
-    gameOverModal.style.display = 'none';
-    startButton.style.display = 'block';
-    canvas.style.display = 'none';
-    resetGame(); // Reset the game to Level 1 when "OK" is clicked
+    if (level > 1) {
+        startNextLevel();
+    } else {
+        resetGame(); // Reset to Level 1 if game over
+        gameOverModal.style.display = 'none';
+        canvas.style.display = 'block';
+    }
 });
 
 function spawnRandomPosition() {
@@ -63,26 +59,23 @@ function spawnRandomPosition() {
 function showLevelCompleteMessage() {
     gameOverMessage.textContent = `Level ${level} completed! 🎉`;
     gameOverModal.style.display = 'flex';
-
-    // Change the "OK" button text to "Start Level X"
     closeModalButton.textContent = `Start Level ${level + 1}`;
-    closeModalButton.onclick = startNextLevel;
+    closeModalButton.onclick = startNextLevel;  // Set the button to start next level
 }
 
 function startNextLevel() {
-    level++; // Increment level
-    resetGame(); // Start the new level
+    level++;
+    resetGame(); // Reset the game state for the new level
     gameOverModal.style.display = 'none'; // Hide the modal
-    canvas.style.display = 'block'; // Show the game canvas
+    canvas.style.display = 'block'; // Show the canvas again
+    gameInterval = setInterval(drawGame, speed); // Start the new level
 }
 
 function showGameOverMessage() {
     gameOverMessage.textContent = `Game Over! Score: ${score}`;
     gameOverModal.style.display = 'flex';
-
-    // Change the "OK" button text to "Start Level 1"
     closeModalButton.textContent = "Start Level 1";
-    closeModalButton.onclick = resetGame;
+    closeModalButton.onclick = resetGame; // Reset to Level 1 on game over
 }
 
 function drawGame() {
