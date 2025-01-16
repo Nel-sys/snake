@@ -46,13 +46,11 @@ startButton.addEventListener('click', () => {
 });
 
 modalButton.addEventListener('click', () => {
-    // If game is over (before the level completion)
-    if (ballsCaught < 5) {
-        resetGame(); // reset game and start over
-    } else {
-        level++; // move to next level
-        resetGame(); // reset the game state to start the new level
-    }
+    // After level completion, increment level
+    level++; 
+    resetGame();
+    // Update modal button text for the next level
+    modalButton.textContent = `Start Level ${level}`;
     // Hide modal and start the game again
     gameOverModal.style.display = 'none';
     canvas.style.display = 'block';
@@ -67,6 +65,7 @@ function spawnRandomPosition() {
 }
 
 function showLevelCompleteMessage() {
+    // Show the correct level in the modal
     gameOverMessage.textContent = `You've completed level ${level}! 🎉😊`;
     modalButton.textContent = `Start Level ${level + 1}`; // Update button text to reflect next level
     gameOverModal.style.display = 'flex';
@@ -121,7 +120,6 @@ function drawGame() {
 
         // If 5 balls are caught, move to the next level
         if (ballsCaught >= 5) {
-            level++;
             showLevelCompleteMessage();
             return; // Exit game loop after level completion
         } else {
