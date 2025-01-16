@@ -3,9 +3,8 @@ const ctx = canvas.getContext('2d');
 const startButton = document.getElementById('startButton');
 const gameOverModal = document.getElementById('gameOverModal');
 const gameOverMessage = document.getElementById('gameOverMessage');
-const closeModalButton = document.getElementById('closeModalButton');
+const modalButton = document.getElementById('modalButton');
 const scoreLevelDisplay = document.getElementById('scoreLevel');
-const modalButton = document.getElementById('modalButton'); // Button to start next level
 
 const unit = 20; // size of one block
 let snake = [{ x: 5 * unit, y: 5 * unit }];
@@ -45,19 +44,18 @@ startButton.addEventListener('click', () => {
     gameInterval = setInterval(drawGame, speed);
 });
 
-closeModalButton.addEventListener('click', () => {
-    gameOverModal.style.display = 'none';
-    startButton.style.display = 'block';
-    canvas.style.display = 'none';
-    clearInterval(gameInterval);
-});
-
-// Start Level 2 button event handler
 modalButton.addEventListener('click', () => {
-    // Reset the game state for the next level
-    level++;
-    resetGame();
-    gameInterval = setInterval(drawGame, speed);
+    // If game is over, reset and start the game
+    if (ballsCaught < 5) {
+        // If we are just restarting, simply reset the game and continue
+        resetGame();
+        gameInterval = setInterval(drawGame, speed);
+    } else {
+        // If level completed, increment level and reset game for the next level
+        level++;
+        resetGame();
+        gameInterval = setInterval(drawGame, speed);
+    }
     gameOverModal.style.display = 'none'; // Hide the modal
     canvas.style.display = 'block'; // Show the canvas again
 });
