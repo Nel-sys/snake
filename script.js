@@ -26,6 +26,7 @@ function resetGame() {
     score = 0;
     ballsCaught = 0;
     speed = 200 - (level - 1) * 30; // Make the game faster as the level increases
+    scoreLevelDisplay.textContent = `Score: ${score} | Level: ${level}`;
 }
 
 document.addEventListener('keydown', changeDirection);
@@ -45,19 +46,17 @@ startButton.addEventListener('click', () => {
 });
 
 modalButton.addEventListener('click', () => {
-    // If game is over, reset and start the game
+    // If game is over (before the level completion)
     if (ballsCaught < 5) {
-        // If we are just restarting, simply reset the game and continue
-        resetGame();
-        gameInterval = setInterval(drawGame, speed);
+        resetGame(); // reset game and start over
     } else {
-        // If level completed, increment level and reset game for the next level
-        level++;
-        resetGame();
-        gameInterval = setInterval(drawGame, speed);
+        level++; // move to next level
+        resetGame(); // reset the game state to start the new level
     }
-    gameOverModal.style.display = 'none'; // Hide the modal
-    canvas.style.display = 'block'; // Show the canvas again
+    // Hide modal and start the game again
+    gameOverModal.style.display = 'none';
+    canvas.style.display = 'block';
+    gameInterval = setInterval(drawGame, speed); // restart the game loop
 });
 
 function spawnRandomPosition() {
@@ -69,14 +68,16 @@ function spawnRandomPosition() {
 
 function showLevelCompleteMessage() {
     gameOverMessage.textContent = `You've completed level ${level}! 🎉😊`;
-    modalButton.textContent = `Start Level ${level + 1}`; // Update button to start next level
+    modalButton.textContent = `Start Level ${level + 1}`; // Update button text to reflect next level
     gameOverModal.style.display = 'flex';
+    clearInterval(gameInterval); // stop game loop at level completion
 }
 
 function showGameOverMessage() {
     gameOverMessage.textContent = `Game Over! Score: ${score}`;
     modalButton.textContent = `Try Again`; // Change button to "Try Again" for game over
     gameOverModal.style.display = 'flex';
+    clearInterval(gameInterval); // stop game loop at game over
 }
 
 function drawGame() {
@@ -122,8 +123,7 @@ function drawGame() {
         if (ballsCaught >= 5) {
             level++;
             showLevelCompleteMessage();
-            clearInterval(gameInterval);
-            return; // Game stops at level completion
+            return; // Exit game loop after level completion
         } else {
             ball = spawnRandomPosition();
             fireballs.push(spawnRandomPosition());
