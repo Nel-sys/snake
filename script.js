@@ -7,26 +7,28 @@ const closeModalButton = document.getElementById('closeModalButton');
 const scoreLevelDisplay = document.getElementById('scoreLevel');
 
 const unit = 20; // size of one block
-let snake = [];
-let ball = {};
-let fireballs = [];
-let direction = 'RIGHT';
-let score = 0;
-let level = 1;
-let ballsCaught = 0; // To track balls caught per level
-let speed = 300; // Base speed, slower than the previous 200ms
+let snake;
+let ball;
+let fireballs;
+let direction;
+let score;
+let level;
+let ballsCaught;
+let speed;
 let gameInterval;
 
 // Initialize game state
 function resetGame() {
-    // Set initial position for snake at the center of the canvas
     snake = [{ x: Math.floor(canvas.width / 2 / unit) * unit, y: Math.floor(canvas.height / 2 / unit) * unit }];
     ball = spawnRandomPosition();
     fireballs = [spawnRandomPosition(), spawnRandomPosition()];
     direction = 'RIGHT';
     score = 0;
     ballsCaught = 0;
-    speed = 300 - (level - 1) * 20; // Slow down the speed less aggressively
+    level = 1;
+    speed = 200; // Base speed, 200ms
+    scoreLevelDisplay.textContent = `Score: ${score} | Level: ${level}`;
+    gameInterval = setInterval(drawGame, speed);
 }
 
 document.addEventListener('keydown', changeDirection);
@@ -42,18 +44,13 @@ startButton.addEventListener('click', () => {
     startButton.style.display = 'none';
     canvas.style.display = 'block';
     resetGame();
-    gameInterval = setInterval(drawGame, speed);
 });
 
 closeModalButton.addEventListener('click', () => {
-    // When game over modal is closed, reset game to level 1
     gameOverModal.style.display = 'none';
     startButton.style.display = 'block';
     canvas.style.display = 'none';
-    level = 1;
-    resetGame();
-    clearInterval(gameInterval);
-    gameInterval = setInterval(drawGame, speed);
+    resetGame(); // Reset the game to Level 1 when "OK" is clicked
 });
 
 function spawnRandomPosition() {
@@ -64,7 +61,7 @@ function spawnRandomPosition() {
 }
 
 function showLevelCompleteMessage() {
-    gameOverMessage.textContent = `You've completed level ${level}! 🎉😊`;
+    gameOverMessage.textContent = `Level ${level} completed! 🎉`;
     gameOverModal.style.display = 'flex';
 }
 
@@ -119,7 +116,6 @@ function drawGame() {
             clearInterval(gameInterval);
             setTimeout(() => {
                 resetGame();
-                gameInterval = setInterval(drawGame, speed);
             }, 2000); // Wait for 2 seconds before starting the next level
         } else {
             ball = spawnRandomPosition();
@@ -165,6 +161,6 @@ function drawFireball(x, y) {
 
 function adjustSpeed() {
     clearInterval(gameInterval);
-    speed = Math.max(50, speed - 10); // Make the game faster as the score increases, but not too fast
+    speed = Math.max(50, speed - 10); // Make the game faster as the score increases
     gameInterval = setInterval(drawGame, speed);
 }
