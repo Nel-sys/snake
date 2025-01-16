@@ -42,6 +42,13 @@ button:hover {
     background-color: #e89c1a;
 }
 
+/* Score and Level Display */
+#scoreLevel {
+    font-size: 1.5em;
+    color: #fdbb2d;
+    margin-bottom: 20px;
+}
+
 /* Modal styles */
 .modal {
     position: fixed;
@@ -63,30 +70,19 @@ button:hover {
     color: #ffffff;
 }
 
-#gameOverMessage {
-    font-size: 1.2em;
+.modal-content p {
+    font-size: 1.5em;
     margin-bottom: 20px;
 }
 
-/* Display score and level */
-#scoreLevel {
-    font-size: 1.5em;
-    color: #fdbb2d;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-family: Arial, sans-serif;
+.modal-content button {
+    padding: 10px 20px;
+    background-color: #fdbb2d;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
-/* Make the game canvas responsive to different screen sizes */
-@media (max-width: 600px) {
-    canvas {
-        width: 100%;
-        height: auto;
-    }
-
-    button {
-        font-size: 0.9em;
-        padding: 8px 16px;
-    }
+.modal-content button:hover {
+    background-color: #e89c1a;
 }
