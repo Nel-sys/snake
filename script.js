@@ -5,6 +5,7 @@ const gameOverModal = document.getElementById('gameOverModal');
 const gameOverMessage = document.getElementById('gameOverMessage');
 const closeModalButton = document.getElementById('closeModalButton');
 const scoreLevelDisplay = document.getElementById('scoreLevel');
+const modalButton = document.getElementById('modalButton'); // Button to start next level
 
 const unit = 20; // size of one block
 let snake = [{ x: 5 * unit, y: 5 * unit }];
@@ -51,6 +52,16 @@ closeModalButton.addEventListener('click', () => {
     clearInterval(gameInterval);
 });
 
+// Start Level 2 button event handler
+modalButton.addEventListener('click', () => {
+    // Reset the game state for the next level
+    level++;
+    resetGame();
+    gameInterval = setInterval(drawGame, speed);
+    gameOverModal.style.display = 'none'; // Hide the modal
+    canvas.style.display = 'block'; // Show the canvas again
+});
+
 function spawnRandomPosition() {
     return {
         x: Math.floor(Math.random() * (canvas.width / unit)) * unit,
@@ -60,11 +71,13 @@ function spawnRandomPosition() {
 
 function showLevelCompleteMessage() {
     gameOverMessage.textContent = `You've completed level ${level}! 🎉😊`;
+    modalButton.textContent = `Start Level ${level + 1}`; // Update button to start next level
     gameOverModal.style.display = 'flex';
 }
 
 function showGameOverMessage() {
     gameOverMessage.textContent = `Game Over! Score: ${score}`;
+    modalButton.textContent = `Try Again`; // Change button to "Try Again" for game over
     gameOverModal.style.display = 'flex';
 }
 
@@ -112,10 +125,7 @@ function drawGame() {
             level++;
             showLevelCompleteMessage();
             clearInterval(gameInterval);
-            setTimeout(() => {
-                resetGame();
-                gameInterval = setInterval(drawGame, speed);
-            }, 2000); // Wait for 2 seconds before starting the next level
+            return; // Game stops at level completion
         } else {
             ball = spawnRandomPosition();
             fireballs.push(spawnRandomPosition());
